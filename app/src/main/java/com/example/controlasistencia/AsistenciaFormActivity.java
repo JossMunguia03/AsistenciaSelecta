@@ -18,10 +18,12 @@ import com.example.controlasistencia.modelo.Empleado;
 public class AsistenciaFormActivity extends AppCompatActivity {
     private Spinner spEmpleado;
     private Spinner spTipoAsistencia;
-    private EditText etFechaEntrada;
-    private EditText etFechaSalida;
+    private EditText etFecha;
+    private EditText etHora;
     private EditText etNotas;
     private Button btnGuardar;
+    private Button btnSeleccionarFecha;
+    private Button btnSeleccionarHora;
 
     private AsistenciaDAO asistenciaDAO;
     private EmpleadoDAO empleadoDAO;
@@ -37,10 +39,12 @@ public class AsistenciaFormActivity extends AppCompatActivity {
 
         spEmpleado = findViewById(R.id.spEmpleado);
         spTipoAsistencia = findViewById(R.id.spTipoAsistencia);
-        etFechaEntrada = findViewById(R.id.etFechaEntrada);
-        etFechaSalida = findViewById(R.id.etFechaSalida);
+        etFecha = findViewById(R.id.etFecha);
+        etHora = findViewById(R.id.etHora);
         etNotas = findViewById(R.id.etNotas);
         btnGuardar = findViewById(R.id.btnGuardar);
+        btnSeleccionarFecha = findViewById(R.id.btnSeleccionarFecha);
+        btnSeleccionarHora = findViewById(R.id.btnSeleccionarHora);
 
         cargarEmpleados();
         cargarTiposAsistencia();
@@ -52,6 +56,31 @@ public class AsistenciaFormActivity extends AppCompatActivity {
         } else {
             setTitle("Nueva Asistencia");
         }
+
+        btnSeleccionarFecha.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mostrarDatePicker();
+            }
+        });
+        etFecha.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mostrarDatePicker();
+            }
+        });
+        btnSeleccionarHora.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mostrarTimePicker();
+            }
+        });
+        etHora.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mostrarTimePicker();
+            }
+        });
 
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,8 +135,8 @@ public class AsistenciaFormActivity extends AppCompatActivity {
                 }
             }
 
-            etFechaEntrada.setText(asistencia.getFechaEntrada());
-            etFechaSalida.setText(asistencia.getFechaSalida());
+            etFecha.setText(asistencia.getFecha());
+            etHora.setText(asistencia.getHora());
             etNotas.setText(asistencia.getNotas());
         }
     }
@@ -115,11 +144,11 @@ public class AsistenciaFormActivity extends AppCompatActivity {
     private void guardarAsistencia() {
         Empleado empleado = (Empleado) spEmpleado.getSelectedItem();
         String tipoAsistencia = spTipoAsistencia.getSelectedItem().toString();
-        String fechaEntrada = etFechaEntrada.getText().toString().trim();
-        String fechaSalida = etFechaSalida.getText().toString().trim();
+        String fecha = etFecha.getText().toString().trim();
+        String hora = etHora.getText().toString().trim();
         String notas = etNotas.getText().toString().trim();
 
-        if (empleado == null || fechaEntrada.isEmpty()) {
+        if (empleado == null || fecha.isEmpty() || hora.isEmpty()) {
             Toast.makeText(this, "Por favor, complete los campos obligatorios", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -130,8 +159,8 @@ public class AsistenciaFormActivity extends AppCompatActivity {
         }
         asistencia.setIdEmpleado(empleado.getId());
         asistencia.setTipoAsistencia(tipoAsistencia);
-        asistencia.setFechaEntrada(fechaEntrada);
-        asistencia.setFechaSalida(fechaSalida);
+        asistencia.setFecha(fecha);
+        asistencia.setHora(hora);
         asistencia.setNotas(notas);
 
         asistenciaDAO.open();
@@ -145,5 +174,28 @@ public class AsistenciaFormActivity extends AppCompatActivity {
         asistenciaDAO.close();
 
         finish();
+    }
+
+    private void mostrarDatePicker() {
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        int year = calendar.get(java.util.Calendar.YEAR);
+        int month = calendar.get(java.util.Calendar.MONTH);
+        int day = calendar.get(java.util.Calendar.DAY_OF_MONTH);
+        android.app.DatePickerDialog datePickerDialog = new android.app.DatePickerDialog(this, (view, year1, month1, dayOfMonth) -> {
+            String fecha = String.format("%02d/%02d/%04d", dayOfMonth, month1 + 1, year1);
+            etFecha.setText(fecha);
+        }, year, month, day);
+        datePickerDialog.show();
+    }
+
+    private void mostrarTimePicker() {
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        int hour = calendar.get(java.util.Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(java.util.Calendar.MINUTE);
+        android.app.TimePickerDialog timePickerDialog = new android.app.TimePickerDialog(this, (view, hourOfDay, minute1) -> {
+            String hora = String.format("%02d:%02d", hourOfDay, minute1);
+            etHora.setText(hora);
+        }, hour, minute, true);
+        timePickerDialog.show();
     }
 } 

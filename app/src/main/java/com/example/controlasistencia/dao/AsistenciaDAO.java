@@ -30,8 +30,8 @@ public class AsistenciaDAO {
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COLUMN_ID_EMPLEADO, asistencia.getIdEmpleado());
         values.put(DatabaseHelper.COLUMN_TIPO_ASISTENCIA, asistencia.getTipoAsistencia());
-        values.put(DatabaseHelper.COLUMN_FECHA_ENTRADA, asistencia.getFechaEntrada());
-        values.put(DatabaseHelper.COLUMN_FECHA_SALIDA, asistencia.getFechaSalida());
+        values.put(DatabaseHelper.COLUMN_FECHA, asistencia.getFecha());
+        values.put(DatabaseHelper.COLUMN_HORA, asistencia.getHora());
         values.put(DatabaseHelper.COLUMN_NOTAS, asistencia.getNotas());
 
         return database.insert(DatabaseHelper.TABLE_ASISTENCIAS, null, values);
@@ -41,8 +41,8 @@ public class AsistenciaDAO {
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COLUMN_ID_EMPLEADO, asistencia.getIdEmpleado());
         values.put(DatabaseHelper.COLUMN_TIPO_ASISTENCIA, asistencia.getTipoAsistencia());
-        values.put(DatabaseHelper.COLUMN_FECHA_ENTRADA, asistencia.getFechaEntrada());
-        values.put(DatabaseHelper.COLUMN_FECHA_SALIDA, asistencia.getFechaSalida());
+        values.put(DatabaseHelper.COLUMN_FECHA, asistencia.getFecha());
+        values.put(DatabaseHelper.COLUMN_HORA, asistencia.getHora());
         values.put(DatabaseHelper.COLUMN_NOTAS, asistencia.getNotas());
 
         return database.update(DatabaseHelper.TABLE_ASISTENCIAS, values,
@@ -90,8 +90,8 @@ public class AsistenciaDAO {
         asistencia.setId(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID)));
         asistencia.setIdEmpleado(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID_EMPLEADO)));
         asistencia.setTipoAsistencia(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_TIPO_ASISTENCIA)));
-        asistencia.setFechaEntrada(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_FECHA_ENTRADA)));
-        asistencia.setFechaSalida(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_FECHA_SALIDA)));
+        asistencia.setFecha(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_FECHA)));
+        asistencia.setHora(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_HORA)));
         asistencia.setNotas(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_NOTAS)));
         return asistencia;
     }

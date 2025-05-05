@@ -53,7 +53,8 @@ public class AsistenciasAdapter extends ArrayAdapter<Asistencia> {
             tvEmpleado.setText(empleado.getNombre() + " " + empleado.getApellidos());
         }
         
-        tvFecha.setText(asistencia.getFechaEntrada());
+        //tvFecha.setText(asistencia.getFechaEntrada());
+        tvFecha.setText(asistencia.getFecha());
         tvTipo.setText(asistencia.getTipoAsistencia());
 
         btnEditar.setOnClickListener(new View.OnClickListener() {

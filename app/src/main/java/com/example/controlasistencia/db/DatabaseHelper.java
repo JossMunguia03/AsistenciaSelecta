@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "AsistenciaSelecta.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Tablas
     public static final String TABLE_EMPLEADOS = "tblEmpleados";
@@ -32,8 +32,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Columnas Asistencias
     public static final String COLUMN_ID_EMPLEADO = "idEmpleado";
     public static final String COLUMN_TIPO_ASISTENCIA = "tipoAsistencia";
-    public static final String COLUMN_FECHA_ENTRADA = "fechaEntrada";
-    public static final String COLUMN_FECHA_SALIDA = "fechaSalida";
+    public static final String COLUMN_FECHA = "fecha";
+    public static final String COLUMN_HORA = "hora";
     public static final String COLUMN_NOTAS = "notas";
 
     // Crear tablas
@@ -60,8 +60,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
         COLUMN_ID_EMPLEADO + " INTEGER, " +
         COLUMN_TIPO_ASISTENCIA + " TEXT NOT NULL, " +
-        COLUMN_FECHA_ENTRADA + " TEXT, " +
-        COLUMN_FECHA_SALIDA + " TEXT, " +
+        COLUMN_FECHA + " TEXT, " +
+        COLUMN_HORA + " TEXT, " +
         COLUMN_NOTAS + " TEXT, " +
         "FOREIGN KEY(" + COLUMN_ID_EMPLEADO + ") REFERENCES " + 
         TABLE_EMPLEADOS + "(" + COLUMN_ID + "))";
