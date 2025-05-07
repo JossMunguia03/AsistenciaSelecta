@@ -1,5 +1,7 @@
 package com.example.controlasistencia;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -7,8 +9,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+import java.util.Calendar;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import android.content.Intent;
 
 import com.example.controlasistencia.dao.AsistenciaDAO;
 import com.example.controlasistencia.dao.EmpleadoDAO;
@@ -28,6 +40,9 @@ public class AsistenciaFormActivity extends AppCompatActivity {
     private AsistenciaDAO asistenciaDAO;
     private EmpleadoDAO empleadoDAO;
     private int asistenciaId = -1;
+
+    private static final int CAMERA_PERMISSION_REQUEST = 100;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +103,22 @@ public class AsistenciaFormActivity extends AppCompatActivity {
                 guardarAsistencia();
             }
         });
+
+        // Inicializar el launcher para permisos
+        requestPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                if (isGranted) {
+                    iniciarEscaneoQR();
+                } else {
+                    Toast.makeText(this, "Se requiere permiso de cámara para escanear QR", Toast.LENGTH_SHORT).show();
+                }
+            }
+        );
+
+        // Agregar botón de escaneo QR
+        Button btnEscanearQR = findViewById(R.id.btnEscanearQR);
+        btnEscanearQR.setOnClickListener(v -> verificarPermisoCamara());
     }
 
     private void cargarEmpleados() {
@@ -197,5 +228,72 @@ public class AsistenciaFormActivity extends AppCompatActivity {
             etHora.setText(hora);
         }, hour, minute, true);
         timePickerDialog.show();
+    }
+
+    private void verificarPermisoCamara() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA);
+        } else {
+            iniciarEscaneoQR();
+        }
+    }
+
+    private void iniciarEscaneoQR() {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
+        integrator.setPrompt("Escanee el código QR del empleado");
+        integrator.setCameraId(0);
+        integrator.setBeepEnabled(true);
+        integrator.setBarcodeImageEnabled(true);
+        integrator.initiateScan();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (result != null) {
+            if (result.getContents() == null) {
+                Toast.makeText(this, "Escaneo cancelado", Toast.LENGTH_SHORT).show();
+            } else {
+                procesarResultadoQR(result.getContents());
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void procesarResultadoQR(String contenido) {
+        try {
+            int idEmpleado = Integer.parseInt(contenido);
+            empleadoDAO.open();
+            Empleado empleado = empleadoDAO.getEmpleado(idEmpleado);
+            empleadoDAO.close();
+
+            if (empleado != null) {
+                // Seleccionar el empleado en el spinner
+                List<Empleado> empleados = empleadoDAO.getAllEmpleados();
+                for (int i = 0; i < empleados.size(); i++) {
+                    if (empleados.get(i).getId() == idEmpleado) {
+                        spEmpleado.setSelection(i);
+                        break;
+                    }
+                }
+
+                // Establecer fecha y hora actual
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                
+                etFecha.setText(dateFormat.format(calendar.getTime()));
+                etHora.setText(timeFormat.format(calendar.getTime()));
+
+                Toast.makeText(this, "Empleado encontrado: " + empleado.getNombre(), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Empleado no encontrado", Toast.LENGTH_SHORT).show();
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Código QR inválido", Toast.LENGTH_SHORT).show();
+        }
     }
 } 

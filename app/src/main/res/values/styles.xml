@@ -1,0 +1,26 @@
+<resources>
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- igual que tenías -->
+    </style>
+
+    <!-- Este style hereda de MaterialComponents y aplica tinte al fondo -->
+    <style name="BotonPrincipal" parent="Widget.MaterialComponents.Button">
+        <!-- ↓ Aquí defines un tamaño razonable para el icono ↓ -->
+        <item name="iconSize">24dp</item>
+        <!-- tinta de fondo -->
+        <item name="backgroundTint">@color/azul_oscuro</item>
+        <!-- color del texto e ícono -->
+        <item name="android:textColor">@color/white</item>
+        <item name="iconTint">@color/white</item>
+        <!-- radio de esquinas -->
+        <item name="cornerRadius">8dp</item>
+        <!-- padding y espaciado del ícono -->
+        <item name="iconPadding">16dp</item>
+        <item name="iconGravity">textStart</item>
+        <!-- padding interno extra si lo necesitas -->
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+    </style>
+</resources>
+
+

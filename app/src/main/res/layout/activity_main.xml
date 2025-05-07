@@ -1,47 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="center">
 
+    android:background="@android:color/white">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ASISTENCIA SELECTA"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:background="@color/azul_oscuro"
+        android:textColor="@color/white"
+        android:padding="12dp"
+        android:layout_marginBottom="8dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_horizontal">
     <ImageView
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:src="@drawable/logo_selecta"
         android:layout_marginBottom="32dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Asistencia Selecta"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="32dp"/>
-
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnEmpleados"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:text="Empleados"
-        android:layout_marginBottom="16dp"
-        style="@style/Widget.MaterialComponents.Button"/>
+        android:textAllCaps="false"
+        app:icon="@drawable/icon_empleados"
+        app:iconSize="24dp"
+        app:iconPadding="16dp"
+        android:gravity="center_vertical|start"
+        style="@style/BotonPrincipal"
+        android:layout_marginBottom="16dp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnDepartamentos"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:text="Departamentos"
-        android:layout_marginBottom="16dp"
-        style="@style/Widget.MaterialComponents.Button"/>
+        android:textAllCaps="false"
+        app:icon="@drawable/icon_departamentos"
+        app:iconSize="24dp"
+        app:iconPadding="16dp"
+        android:gravity="center_vertical|start"
+        style="@style/BotonPrincipal"
+        android:layout_marginBottom="16dp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnAsistencias"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:text="Asistencias"
-        android:layout_marginBottom="16dp"
-        style="@style/Widget.MaterialComponents.Button"/>
-
+        android:textAllCaps="false"
+        app:icon="@drawable/icon_asistencias"
+        app:iconSize="24dp"
+        app:iconPadding="16dp"
+        android:gravity="center_vertical|start"
+        style="@style/BotonPrincipal"
+        android:layout_marginBottom="16dp"/>
+    </LinearLayout>
 </LinearLayout>

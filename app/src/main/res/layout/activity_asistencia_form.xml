@@ -9,6 +9,13 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <Button
+            android:id="@+id/btnEscanearQR"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Escanear QR"
+            android:layout_marginBottom="16dp"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,33 +42,51 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"/>
 
-        <com.google.android.material.textfield.TextInputLayout
+        <!-- Campo para seleccionar la fecha -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_marginBottom="8dp">
 
             <EditText
-                android:id="@+id/etFechaEntrada"
-                android:layout_width="match_parent"
+                android:id="@+id/etFecha"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="Fecha y hora de entrada"
-                android:inputType="datetime"/>
+                android:layout_weight="1"
+                android:hint="Fecha"
+                android:focusable="false"
+                android:clickable="true"/>
 
-        </com.google.android.material.textfield.TextInputLayout>
+            <Button
+                android:id="@+id/btnSeleccionarFecha"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fecha"/>
+        </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
+        <!-- Campo para seleccionar la hora -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_marginBottom="8dp">
 
             <EditText
-                android:id="@+id/etFechaSalida"
-                android:layout_width="match_parent"
+                android:id="@+id/etHora"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="Fecha y hora de salida"
-                android:inputType="datetime"/>
+                android:layout_weight="1"
+                android:hint="Hora"
+                android:focusable="false"
+                android:clickable="true"/>
 
-        </com.google.android.material.textfield.TextInputLayout>
+            <Button
+                android:id="@+id/btnSeleccionarHora"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hora"/>
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -83,7 +108,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Guardar"
-            style="@style/Widget.MaterialComponents.Button"/>
+            style="@style/BotonPrincipal"/>
 
     </LinearLayout>
 

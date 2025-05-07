@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.controlasistencia">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -16,19 +19,20 @@
         
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         
-        <activity android:name=".EmpleadosActivity" />
-        <activity android:name=".EmpleadoFormActivity" />
-        <activity android:name=".DepartamentosActivity" />
-        <activity android:name=".DepartamentoFormActivity" />
-        <activity android:name=".AsistenciasActivity" />
-        <activity android:name=".AsistenciaFormActivity" />
+        <activity android:name=".EmpleadosActivity" android:theme="@style/AppTheme" />
+        <activity android:name=".EmpleadoFormActivity" android:theme="@style/AppTheme" />
+        <activity android:name=".DepartamentosActivity" android:theme="@style/AppTheme" />
+        <activity android:name=".DepartamentoFormActivity" android:theme="@style/AppTheme" />
+        <activity android:name=".AsistenciasActivity" android:theme="@style/AppTheme" />
+        <activity android:name=".AsistenciaFormActivity" android:theme="@style/AppTheme" />
         
     </application>
 
