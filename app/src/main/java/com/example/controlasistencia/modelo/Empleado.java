@@ -39,4 +39,9 @@ public class Empleado {
     public void setPuesto(String puesto) { this.puesto = puesto; }
     public void setEmail(String email) { this.email = email; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
+
+    @Override
+    public String toString() {
+        return nombre + " " + apellidos;
+    }
 } 

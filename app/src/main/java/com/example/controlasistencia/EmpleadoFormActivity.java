@@ -125,8 +125,8 @@ public class EmpleadoFormActivity extends AppCompatActivity {
             empleadoDAO.updateEmpleado(empleado);
             Toast.makeText(this, "Empleado actualizado", Toast.LENGTH_SHORT).show();
         } else {
-            empleadoDAO.insertEmpleado(empleado);
-            Toast.makeText(this, "Empleado creado", Toast.LENGTH_SHORT).show();
+            long id = empleadoDAO.insertEmpleado(empleado);
+            Toast.makeText(this, "Empleado creado. ID: " + id, Toast.LENGTH_LONG).show();
         }
         empleadoDAO.close();
 

@@ -68,7 +68,7 @@ public class DepartamentoDAO {
     public List<Departamento> getAllDepartamentos() {
         List<Departamento> departamentos = new ArrayList<>();
         Cursor cursor = database.query(DatabaseHelper.TABLE_DEPARTAMENTOS,
-                null, null, null, null, null, null);
+                null, null, null, null, null, DatabaseHelper.COLUMN_NOMBRE + " ASC");
 
         if (cursor != null && cursor.moveToFirst()) {
             do {

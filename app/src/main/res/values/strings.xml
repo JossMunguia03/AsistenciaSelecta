@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Apli</string>
+    <string name="app_name">Asistencia Selecta</string>
 
     <string name="txt_crear_tutor">Registrar tutor: </string>
     <string name="txt_crear_alumno">Registrar alumno(requiere tutor): </string>

@@ -87,6 +87,37 @@ public class EmpleadoDAO {
         return empleados;
     }
 
+    public List<Empleado> getAllEmpleadosOrdenados() {
+        List<Empleado> empleados = new ArrayList<>();
+        Cursor cursor = database.query(DatabaseHelper.TABLE_EMPLEADOS,
+                null, null, null, null, null, DatabaseHelper.COLUMN_NOMBRE + " ASC");
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                empleados.add(cursorToEmpleado(cursor));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return empleados;
+    }
+
+    public List<Empleado> getEmpleadosPorDepartamento(int idDepartamento) {
+        List<Empleado> empleados = new ArrayList<>();
+        Cursor cursor = database.query(DatabaseHelper.TABLE_EMPLEADOS,
+                null,
+                DatabaseHelper.COLUMN_ID_DEPARTAMENTO + " = ?",
+                new String[]{String.valueOf(idDepartamento)},
+                null, null, DatabaseHelper.COLUMN_NOMBRE + " ASC");
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                empleados.add(cursorToEmpleado(cursor));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return empleados;
+    }
+
     private Empleado cursorToEmpleado(Cursor cursor) {
         Empleado empleado = new Empleado();
         empleado.setId(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID)));

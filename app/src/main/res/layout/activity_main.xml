@@ -7,7 +7,7 @@
     android:padding="16dp"
 
     android:background="@android:color/white">
-
+<!--
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,7 +18,7 @@
         android:background="@color/azul_oscuro"
         android:textColor="@color/white"
         android:padding="12dp"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"/>-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

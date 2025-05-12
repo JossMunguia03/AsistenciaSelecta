@@ -85,6 +85,21 @@ public class AsistenciaDAO {
         return asistencias;
     }
 
+    public List<Asistencia> getAsistenciasOrdenadasPorFechaHora(boolean descendente) {
+        List<Asistencia> asistencias = new ArrayList<>();
+        String orden = DatabaseHelper.COLUMN_FECHA + " " + (descendente ? "DESC" : "ASC") + ", " + DatabaseHelper.COLUMN_HORA + " " + (descendente ? "DESC" : "ASC");
+        Cursor cursor = database.query(DatabaseHelper.TABLE_ASISTENCIAS,
+                null, null, null, null, null, orden);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                asistencias.add(cursorToAsistencia(cursor));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return asistencias;
+    }
+
     private Asistencia cursorToAsistencia(Cursor cursor) {
         Asistencia asistencia = new Asistencia();
         asistencia.setId(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID)));

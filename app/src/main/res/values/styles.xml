@@ -1,6 +1,9 @@
 <resources>
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <!-- igual que tenías -->
+        <item name="colorPrimary">@color/azul_oscuro</item>
+        <item name="colorPrimaryDark">@color/azul_oscuro</item>
+        <item name="colorAccent">@color/azul_oscuro</item>
     </style>
 
     <!-- Este style hereda de MaterialComponents y aplica tinte al fondo -->
