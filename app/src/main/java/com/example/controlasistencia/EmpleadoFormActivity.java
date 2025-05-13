@@ -126,7 +126,8 @@ public class EmpleadoFormActivity extends AppCompatActivity {
             Toast.makeText(this, "Empleado actualizado", Toast.LENGTH_SHORT).show();
         } else {
             long id = empleadoDAO.insertEmpleado(empleado);
-            Toast.makeText(this, "Empleado creado. ID: " + id, Toast.LENGTH_LONG).show();
+            String mensaje = "¡Empleado creado exitosamente!\n\nID asignado: " + id + "\n\nGuarda este ID para usar con el lector QR";
+            Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show();
         }
         empleadoDAO.close();
 

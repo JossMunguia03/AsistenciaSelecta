@@ -266,29 +266,29 @@ public class AsistenciaFormActivity extends AppCompatActivity {
     private void procesarResultadoQR(String contenido) {
         try {
             int idEmpleado = Integer.parseInt(contenido);
-            empleadoDAO.open();
-            Empleado empleado = empleadoDAO.getEmpleado(idEmpleado);
-            empleadoDAO.close();
 
-            if (empleado != null) {
-                // Seleccionar el empleado en el spinner
-                List<Empleado> empleados = empleadoDAO.getAllEmpleados();
-                for (int i = 0; i < empleados.size(); i++) {
-                    if (empleados.get(i).getId() == idEmpleado) {
-                        spEmpleado.setSelection(i);
-                        break;
-                    }
+            // Usar la lista actual del spinner
+            int index = -1;
+            for (int i = 0; i < spEmpleado.getCount(); i++) {
+                Empleado emp = (Empleado) spEmpleado.getItemAtPosition(i);
+                if (emp.getId() == idEmpleado) {
+                    index = i;
+                    break;
                 }
+            }
+
+            if (index != -1) {
+                spEmpleado.setSelection(index);
 
                 // Establecer fecha y hora actual
                 Calendar calendar = Calendar.getInstance();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                
+
                 etFecha.setText(dateFormat.format(calendar.getTime()));
                 etHora.setText(timeFormat.format(calendar.getTime()));
 
-                Toast.makeText(this, "Empleado encontrado: " + empleado.getNombre(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Empleado seleccionado: " + ((Empleado) spEmpleado.getItemAtPosition(index)).getNombre(), Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Empleado no encontrado", Toast.LENGTH_SHORT).show();
             }
