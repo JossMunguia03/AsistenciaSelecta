@@ -93,6 +93,16 @@ public class DepartamentoFormActivity extends AppCompatActivity {
             public void onError(String mensajeError) {
                 Toast.makeText(DepartamentoFormActivity.this, mensajeError, Toast.LENGTH_SHORT).show();
             }
+
+            @Override
+            public void onDepartamentoCreado(String mensajeExito) {
+
+            }
+
+            @Override
+            public void onErrorDepartamento(String mensajeError) {
+
+            }
         });
     }
     private void cargarDepartamentoGoogle(){
@@ -156,8 +166,32 @@ public class DepartamentoFormActivity extends AppCompatActivity {
             departamentoDAO.updateDepartamento(departamento);
             Toast.makeText(this, "Departamento actualizado", Toast.LENGTH_SHORT).show();
         } else {
+            /*
             departamentoDAO.insertDepartamento(departamento);
             Toast.makeText(this, "Departamento creado", Toast.LENGTH_SHORT).show();
+
+             */
+            departamentoDAO.nuevoDepartamento(nombre, descripcion, new DepartamentoDAO.DepartamentoCallback() {
+                @Override
+                public void onDepartamentosCargados(List<Departamento> departamentos) {
+
+                }
+
+                @Override
+                public void onError(String mensajeError) {
+
+                }
+
+                @Override
+                public void onDepartamentoCreado(String mensajeExito) {
+                    Toast.makeText(DepartamentoFormActivity.this, mensajeExito, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onErrorDepartamento(String mensajeError) {
+                    Toast.makeText(DepartamentoFormActivity.this, mensajeError, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
         finish();

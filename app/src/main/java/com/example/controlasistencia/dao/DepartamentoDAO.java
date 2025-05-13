@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Looper;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.logging.Handler;
 
 import com.example.controlasistencia.db.DatabaseHelper;
+import com.example.controlasistencia.modelo.DataPost;
 import com.example.controlasistencia.modelo.Departamento;
 import com.example.controlasistencia.utils.Common;
 
@@ -31,11 +33,15 @@ public class DepartamentoDAO {
     private IGoogleSheets iGoogleSheets;
     public DepartamentoDAO(Context context) {
         dbHelper = new DatabaseHelper(context);
+        iGoogleSheets = Common.iGSGetMethodClient(Common.BASE_URL);
     }
 
     public interface DepartamentoCallback {
         void onDepartamentosCargados(List<Departamento> departamentos);
         void onError(String mensajeError);
+
+        void onDepartamentoCreado(String mensajeExito);
+        void onErrorDepartamento(String mensajeError);
     }
 
 
@@ -154,6 +160,47 @@ public class DepartamentoDAO {
             Log.e("cargaDepartamento", "Error: " + e.getMessage(), e);
 
         }
+
+    }
+
+    public void nuevoDepartamento(String nombre, String descripcion, DepartamentoCallback callback){
+        List<List<String>> rows = new ArrayList<>();
+        List<String> rowData = new ArrayList<>();
+        rowData.add(nombre);
+        rowData.add(descripcion);
+        rows.add(rowData);
+
+         DataPost dataPost = new DataPost(
+                Common.GOOGLE_SHEET_ID,
+                "departamento",
+                rows
+        );
+
+         iGoogleSheets.sendData(dataPost).enqueue(new Callback<String>() {
+             @Override
+             public void onResponse(Call<String> call, Response<String> response) {
+                 if (response.isSuccessful() && response.body() != null) {
+                     Log.d("CrearDepartamento", "Respuesta POST: " + response.body());
+                     callback.onDepartamentoCreado(response.body()); // Llama al callback con la respuesta
+                 } else {
+                     String errorMessage = "Error al enviar datos. Código: " + response.code();
+                     if (response.errorBody() != null) {
+                         try {
+                             errorMessage += ", Mensaje: " + response.errorBody().string();
+                         } catch (IOException e) {
+                             e.printStackTrace();
+                         }
+                     }
+                     callback.onErrorDepartamento(errorMessage);
+                 }
+             }
+
+             @Override
+             public void onFailure(Call<String> call, Throwable t) {
+                 Log.e("CrearDepartamento", "Fallo al conectar (POST): " + t.getMessage());
+                 callback.onErrorDepartamento("Error de conexión al enviar datos.");
+             }
+         });
 
     }
 

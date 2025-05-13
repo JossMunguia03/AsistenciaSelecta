@@ -107,6 +107,16 @@ public class DepartamentosActivity extends AppCompatActivity {
             public void onError(String mensajeError) {
                 Toast.makeText(DepartamentosActivity.this, mensajeError, Toast.LENGTH_SHORT).show();
             }
+
+            @Override
+            public void onDepartamentoCreado(String mensajeExito) {
+
+            }
+
+            @Override
+            public void onErrorDepartamento(String mensajeError) {
+
+            }
         });
 
         }

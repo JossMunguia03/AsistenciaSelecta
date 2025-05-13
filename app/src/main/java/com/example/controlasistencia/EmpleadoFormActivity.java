@@ -83,7 +83,7 @@ public class EmpleadoFormActivity extends AppCompatActivity {
             public void onDepartamentosCargados(List<Departamento> departamentos) {
                 List<String> nombresDepartamentos = new ArrayList<>();
                 for (Departamento departamento : departamentos) {
-                    nombresDepartamentos.add(departamento.getNombre());
+                    nombresDepartamentos.add( departamento.getId() + " - "  + departamento.getNombre());
                 }
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(EmpleadoFormActivity.this,
                         android.R.layout.simple_spinner_item, nombresDepartamentos);
@@ -93,6 +93,16 @@ public class EmpleadoFormActivity extends AppCompatActivity {
             @Override
             public void onError(String mensajeError) {
                 Toast.makeText(EmpleadoFormActivity.this, mensajeError, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onDepartamentoCreado(String mensajeExito) {
+
+            }
+
+            @Override
+            public void onErrorDepartamento(String mensajeError) {
+
             }
 
 
@@ -155,6 +165,16 @@ public class EmpleadoFormActivity extends AppCompatActivity {
             public void onError(String mensajeError) {
                 // Manejar el error si es necesario
             }
+
+            @Override
+            public void onEmpleadoCreado(String mensajeExito) {
+
+            }
+
+            @Override
+            public void onErrorEmpleado(String mensajeError) {
+
+            }
         });
 
     }
@@ -162,7 +182,7 @@ public class EmpleadoFormActivity extends AppCompatActivity {
     private void guardarEmpleado() {
         String nombre = etNombre.getText().toString().trim();
         String apellidos = etApellidos.getText().toString().trim();
-        Departamento departamento = (Departamento) spDepartamento.getSelectedItem();
+
         String puesto = etPuesto.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String telefono = etTelefono.getText().toString().trim();
@@ -176,22 +196,54 @@ public class EmpleadoFormActivity extends AppCompatActivity {
         if (empleadoId != -1) {
             empleado.setId(empleadoId);
         }
+
+
+        String idDepartamento = spDepartamento.getSelectedItem().toString();
+        String[] partes = idDepartamento.split(" - ");
+        idDepartamento = partes[0];
+        Integer.parseInt(idDepartamento);
+
         empleado.setNombre(nombre);
         empleado.setApellidos(apellidos);
-        empleado.setIdDepartamento(departamento.getId());
+        empleado.setIdDepartamento(Integer.parseInt(idDepartamento));
         empleado.setPuesto(puesto);
         empleado.setEmail(email);
         empleado.setTelefono(telefono);
 
-        empleadoDAO.open();
+
+        //empleadoDAO.open();
         if (empleadoId != -1) {
-            empleadoDAO.updateEmpleado(empleado);
+            //empleadoDAO.updateEmpleado(empleado);
             Toast.makeText(this, "Empleado actualizado", Toast.LENGTH_SHORT).show();
         } else {
+            /*
             empleadoDAO.insertEmpleado(empleado);
             Toast.makeText(this, "Empleado creado", Toast.LENGTH_SHORT).show();
+
+             */
+            empleadoDAO.nuevoEmpleado(nombre, apellidos, Integer.parseInt(idDepartamento), puesto, email, telefono, new EmpleadoDAO.EmpleadoCallback() {
+                @Override
+                public void onEmpleadosCargados(List<Empleado> empleados) {
+
+                }
+
+                @Override
+                public void onError(String mensajeError) {
+
+                }
+
+                @Override
+                public void onEmpleadoCreado(String mensajeExito) {
+                    Toast.makeText(EmpleadoFormActivity.this, "Empleado creado", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onErrorEmpleado(String mensajeError) {
+                    Toast.makeText(EmpleadoFormActivity.this, "Error al crear el empleado", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
-        empleadoDAO.close();
+        //empleadoDAO.close();
 
         finish();
     }

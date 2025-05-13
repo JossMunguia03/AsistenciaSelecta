@@ -49,6 +49,8 @@ public class AsistenciaFormActivity extends AppCompatActivity {
     private EmpleadoDAO empleadoDAO;
     private int asistenciaId = -1;
 
+    private int empleado_id = -1;
+
     private static final int CAMERA_PERMISSION_REQUEST = 100;
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
@@ -73,6 +75,8 @@ public class AsistenciaFormActivity extends AppCompatActivity {
         cargarTiposAsistencia();
 
         asistenciaId = getIntent().getIntExtra("asistencia_id", -1);
+        empleado_id = getIntent().getIntExtra("empleado_id", -1);
+
         if (asistenciaId != -1) {
             setTitle("Editar Asistencia");
             cargarAsistencia();
@@ -148,17 +152,37 @@ public class AsistenciaFormActivity extends AppCompatActivity {
             public void onEmpleadosCargados(List<Empleado> empleados) {
                 List<String> nombresEmpleados = new ArrayList<>();
                 for (Empleado empleado : empleados) {
-                    nombresEmpleados.add(empleado.getNombre());
+                    nombresEmpleados.add( empleado.getId() + " - " + empleado.getNombre());
                 }
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(AsistenciaFormActivity.this,
                         android.R.layout.simple_spinner_item, nombresEmpleados);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spEmpleado.setAdapter(adapter);
+
+
+                for (int i = 0; i < empleados.size(); i++) {
+                    if (empleados.get(i).getId() == empleado_id) {
+                        spEmpleado.setSelection(i);
+                        break;
+                    }
+                }
+
+
             }
             @Override
             public void onError(String mensajeError) {
                 Toast.makeText(AsistenciaFormActivity.this, mensajeError, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onEmpleadoCreado(String mensajeExito) {
+
+            }
+
+            @Override
+            public void onErrorEmpleado(String mensajeError) {
+
             }
         });
 
@@ -235,6 +259,7 @@ public class AsistenciaFormActivity extends AppCompatActivity {
 
                         etHora.setText(fechaFormateada);
                         etNotas.setText(asistencia.getNotas());
+
                     }
                     });
 

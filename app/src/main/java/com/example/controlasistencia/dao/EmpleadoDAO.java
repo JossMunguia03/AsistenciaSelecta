@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.Map;
 import com.example.controlasistencia.DepartamentosActivity;
 import com.example.controlasistencia.adapter.DepartamentosAdapter;
 import com.example.controlasistencia.db.DatabaseHelper;
+import com.example.controlasistencia.modelo.DataPost;
 import com.example.controlasistencia.modelo.Departamento;
 import com.example.controlasistencia.modelo.Empleado;
 import com.example.controlasistencia.modelo.IGoogleSheets;
@@ -36,12 +38,17 @@ public class EmpleadoDAO {
     private DepartamentoDAO departamentoDAO;
     public EmpleadoDAO(Context context) {
         dbHelper = new DatabaseHelper(context);
+        iGoogleSheets = Common.iGSGetMethodClient(Common.BASE_URL);
     }
 
     public interface EmpleadoCallback {
         void onEmpleadosCargados(List<Empleado> empleados);
         void onError(String mensajeError);
+        void onEmpleadoCreado(String mensajeExito);
+        void onErrorEmpleado(String mensajeError);
     }
+
+
     public void open() {
         database = dbHelper.getWritableDatabase();
     }
@@ -179,6 +186,60 @@ public class EmpleadoDAO {
             @Override
             public void onError(String mensajeError) {
 
+            }
+
+            @Override
+            public void onDepartamentoCreado(String mensajeExito) {
+
+            }
+
+            @Override
+            public void onErrorDepartamento(String mensajeError) {
+
+            }
+        });
+
+    }
+    public void nuevoEmpleado(String nombre, String apellidos, int idDepartamento, String puesto, String email, String telefono, EmpleadoCallback callback){
+        List<List<String>> rows = new ArrayList<>();
+        List<String> rowData = new ArrayList<>();
+        rowData.add(nombre);
+        rowData.add(apellidos);
+        rowData.add(String.valueOf(idDepartamento));
+        rowData.add(puesto);
+        rowData.add(email);
+        rowData.add(telefono);
+        rows.add(rowData);
+
+        DataPost dataPost = new DataPost(
+                Common.GOOGLE_SHEET_ID,
+                "empleado",
+                rows
+        );
+
+        iGoogleSheets.sendData(dataPost).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d("crearEmpleado", "Respuesta POST: " + response.body());
+                    callback.onEmpleadoCreado(response.body()); // Llama al callback con la respuesta
+                } else {
+                    String errorMessage = "Error al enviar datos. Código: " + response.code();
+                    if (response.errorBody() != null) {
+                        try {
+                            errorMessage += ", Mensaje: " + response.errorBody().string();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    callback.onErrorEmpleado(errorMessage);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("CrearDepartamento", "Fallo al conectar (POST): " + t.getMessage());
+                callback.onErrorEmpleado("Error de conexión al enviar datos.");
             }
         });
 

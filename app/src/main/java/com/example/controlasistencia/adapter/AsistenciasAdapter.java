@@ -64,6 +64,7 @@ public class AsistenciasAdapter extends ArrayAdapter<Asistencia> {
             public void onClick(View v) {
                 Intent intent = new Intent(context, AsistenciaFormActivity.class);
                 intent.putExtra("asistencia_id", asistencia.getId());
+                intent.putExtra("empleado_id", asistencia.getIdEmpleado());
                 context.startActivity(intent);
             }
         });

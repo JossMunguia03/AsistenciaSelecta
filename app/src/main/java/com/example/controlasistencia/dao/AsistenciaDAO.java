@@ -32,6 +32,7 @@ public class AsistenciaDAO {
     private IGoogleSheets iGoogleSheets;
     public AsistenciaDAO(Context context) {
         dbHelper = new DatabaseHelper(context);
+        iGoogleSheets = Common.iGSGetMethodClient(Common.BASE_URL);
     }
 
     public interface AsistenciaCallback {
@@ -208,7 +209,17 @@ public class AsistenciaDAO {
             public void onError(String mensajeError) {
 
                 }
-            });
+
+            @Override
+            public void onEmpleadoCreado(String mensajeExito) {
+
+            }
+
+            @Override
+            public void onErrorEmpleado(String mensajeError) {
+
+            }
+        });
 
 
 

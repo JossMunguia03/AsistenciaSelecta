@@ -72,6 +72,16 @@ public class EmpleadosActivity extends AppCompatActivity {
             public void onError(String mensajeError) {
                 // Manejar el error si es necesario
             }
+
+            @Override
+            public void onEmpleadoCreado(String mensajeExito) {
+
+            }
+
+            @Override
+            public void onErrorEmpleado(String mensajeError) {
+
+            }
         });
     }
 } 

@@ -3,6 +3,7 @@ package com.example.controlasistencia.modelo;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class GoogleSheetsResponse {
@@ -22,6 +23,7 @@ public class GoogleSheetsResponse {
 
                     .client(client)
                     .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
         return retrofit;

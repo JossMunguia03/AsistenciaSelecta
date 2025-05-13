@@ -15,5 +15,5 @@ public interface IGoogleSheets {
     Call<String> getData(@QueryMap Map<String, String> queryParameters); // Usamos @QueryMap para pasar parámetros dinámicamente
 
     @POST("exec") // Igual para el método POST
-    Call<String> GetStringRequestBody(@Query("action") String action, @Body String body); // Podemos añadir parámetros fijos aquí
+    Call<String> sendData(@Body DataPost dataPost);
 }
