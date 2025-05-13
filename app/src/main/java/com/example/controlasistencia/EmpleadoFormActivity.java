@@ -1,6 +1,7 @@
 package com.example.controlasistencia;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -8,8 +9,11 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
 import java.util.List;
 
+import com.example.controlasistencia.adapter.EmpleadosAdapter;
 import com.example.controlasistencia.dao.DepartamentoDAO;
 import com.example.controlasistencia.dao.EmpleadoDAO;
 import com.example.controlasistencia.modelo.Departamento;
@@ -63,6 +67,7 @@ public class EmpleadoFormActivity extends AppCompatActivity {
     }
 
     private void cargarDepartamentos() {
+        /*
         departamentoDAO.open();
         List<Departamento> departamentos = departamentoDAO.getAllDepartamentos();
         departamentoDAO.close();
@@ -71,9 +76,32 @@ public class EmpleadoFormActivity extends AppCompatActivity {
                 android.R.layout.simple_spinner_item, departamentos);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spDepartamento.setAdapter(adapter);
+
+         */
+        departamentoDAO.cargarDepartamentoGoogle(new DepartamentoDAO.DepartamentoCallback() {
+            @Override
+            public void onDepartamentosCargados(List<Departamento> departamentos) {
+                List<String> nombresDepartamentos = new ArrayList<>();
+                for (Departamento departamento : departamentos) {
+                    nombresDepartamentos.add(departamento.getNombre());
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(EmpleadoFormActivity.this,
+                        android.R.layout.simple_spinner_item, nombresDepartamentos);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spDepartamento.setAdapter(adapter);
+            }
+            @Override
+            public void onError(String mensajeError) {
+                Toast.makeText(EmpleadoFormActivity.this, mensajeError, Toast.LENGTH_SHORT).show();
+            }
+
+
+        });
+
     }
 
     private void cargarEmpleado() {
+        /*
         empleadoDAO.open();
         Empleado empleado = empleadoDAO.getEmpleado(empleadoId);
         empleadoDAO.close();
@@ -94,6 +122,41 @@ public class EmpleadoFormActivity extends AppCompatActivity {
                 }
             }
         }
+
+         */
+
+
+
+
+        empleadoDAO.cargarEmpleadoGoogle(new EmpleadoDAO.EmpleadoCallback() {
+
+            @Override
+            public void onEmpleadosCargados(List<Empleado> empleados) {
+                for (Empleado empleado : empleados) {
+                    if (empleado.getId() == empleadoId) {
+                        etNombre.setText(empleado.getNombre());
+                        etApellidos.setText(empleado.getApellidos());
+                        etPuesto.setText(empleado.getPuesto());
+                        etEmail.setText(empleado.getEmail());
+                        etTelefono.setText(empleado.getTelefono());
+                        break;
+                    }
+                }
+
+
+
+
+
+
+
+            }
+
+            @Override
+            public void onError(String mensajeError) {
+                // Manejar el error si es necesario
+            }
+        });
+
     }
 
     private void guardarEmpleado() {

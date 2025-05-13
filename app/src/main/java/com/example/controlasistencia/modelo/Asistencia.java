@@ -8,6 +8,10 @@ public class Asistencia {
     private String hora;
     private String notas;
 
+    private String empleado;
+
+    private String apellidoEmpleado;
+
     public Asistencia() {
     }
 
@@ -18,6 +22,8 @@ public class Asistencia {
         this.fecha = fecha;
         this.hora = hora;
         this.notas = notas;
+        this.empleado = "Error";
+        this.apellidoEmpleado = "Error";
     }
 
     // Getters
@@ -28,6 +34,12 @@ public class Asistencia {
     public String getHora() { return hora; }
     public String getNotas() { return notas; }
 
+    public String getEmpleado() { return empleado; }
+
+    public String getApellidoEmpleado() { return apellidoEmpleado; }
+
+
+
     // Setters
     public void setId(int id) { this.id = id; }
     public void setIdEmpleado(int idEmpleado) { this.idEmpleado = idEmpleado; }
@@ -35,4 +47,9 @@ public class Asistencia {
     public void setFecha(String fecha) { this.fecha = fecha; }
     public void setHora(String hora) { this.hora = hora; }
     public void setNotas(String notas) { this.notas = notas; }
+
+    public void setEmpleado(String empleado) { this.empleado = empleado; }
+
+    public void setApellidoEmpleado(String apellidoEmpleado) { this.apellidoEmpleado = apellidoEmpleado; }
+
 } 

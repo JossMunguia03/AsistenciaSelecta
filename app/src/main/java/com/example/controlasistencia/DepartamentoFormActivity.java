@@ -7,17 +7,31 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.controlasistencia.adapter.DepartamentosAdapter;
 import com.example.controlasistencia.dao.DepartamentoDAO;
 import com.example.controlasistencia.modelo.Departamento;
+import com.example.controlasistencia.modelo.IGoogleSheets;
+import com.example.controlasistencia.utils.Common;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DepartamentoFormActivity extends AppCompatActivity {
     private EditText etNombre;
     private EditText etDescripcion;
     private Button btnGuardar;
 
+    private List<Departamento> departamentoList;
     private DepartamentoDAO departamentoDAO;
     private int departamentoId = -1;
-
+    IGoogleSheets iGoogleSheets;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,13 +67,75 @@ public class DepartamentoFormActivity extends AppCompatActivity {
     }
 
     private void cargarDepartamento() {
+
+        /*
         Departamento departamento = departamentoDAO.getDepartamento(departamentoId);
         if (departamento != null) {
             etNombre.setText(departamento.getNombre());
             etDescripcion.setText(departamento.getDescripcion());
         }
-    }
 
+         */
+
+        departamentoDAO.cargarDepartamentoGoogle(new DepartamentoDAO.DepartamentoCallback() {
+            @Override
+            public void onDepartamentosCargados(List<Departamento> departamentos) {
+                for (Departamento departamento : departamentos) {
+                    if (departamento.getId() == departamentoId) {
+                        etNombre.setText(departamento.getNombre());
+                        etDescripcion.setText(departamento.getDescripcion());
+                        break;
+                    }
+                }
+
+            }
+            @Override
+            public void onError(String mensajeError) {
+                Toast.makeText(DepartamentoFormActivity.this, mensajeError, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void cargarDepartamentoGoogle(){
+        String pathUrl;
+
+/*
+        try {
+            pathUrl = "?spreadsheetId" + Common.GOOGLE_SHEET_ID + "$sheet=departamento";
+            iGoogleSheets.getData(pathUrl).enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    try {
+                        assert response.body() != null;
+                        JSONObject responseObject = new JSONObject(response.body());
+                        JSONArray datosArray = responseObject.getJSONArray("datos");
+
+                        for (int i = 0; i < datosArray.length(); i++){
+                            JSONObject object = datosArray.getJSONObject(i);
+                            int id = object.getInt("id");
+                            String nombre = object.getString("nombre");
+                            String descripcion = object.getString("descripcion");
+
+                            Departamento departamento = new Departamento(id, nombre, descripcion);
+                            departamentoList.add(departamento);
+
+                        }
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+ */
+    }
     private void guardarDepartamento() {
         String nombre = etNombre.getText().toString().trim();
         String descripcion = etDescripcion.getText().toString().trim();

@@ -4,12 +4,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.List;
 
 import com.example.controlasistencia.adapter.AsistenciasAdapter;
+import com.example.controlasistencia.adapter.DepartamentosAdapter;
 import com.example.controlasistencia.dao.AsistenciaDAO;
+import com.example.controlasistencia.dao.DepartamentoDAO;
 import com.example.controlasistencia.modelo.Asistencia;
+import com.example.controlasistencia.modelo.Departamento;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class AsistenciasActivity extends AppCompatActivity {
@@ -52,8 +57,20 @@ public class AsistenciasActivity extends AppCompatActivity {
     }
 
     private void cargarAsistencias() {
-        List<Asistencia> asistencias = asistenciaDAO.getAllAsistencias();
-        AsistenciasAdapter adapter = new AsistenciasAdapter(this, asistencias);
-        listViewAsistencias.setAdapter(adapter);
+        //List<Asistencia> asistencias = asistenciaDAO.getAllAsistencias();
+        asistenciaDAO.cargarAsistenciaGoogle(new AsistenciaDAO.AsistenciaCallback() {
+            @Override
+            public void onAsistenciasCargadas(List<Asistencia> asistencias) {
+                AsistenciasAdapter adapter = new AsistenciasAdapter(AsistenciasActivity.this, asistencias);
+                listViewAsistencias.setAdapter(adapter);
+            }
+            @Override
+            public void onError(String mensajeError) {
+                Toast.makeText(AsistenciasActivity.this, mensajeError, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //AsistenciasAdapter adapter = new AsistenciasAdapter(this, asistencias);
+        //listViewAsistencias.setAdapter(adapter);
     }
 } 

@@ -2,7 +2,9 @@ package com.example.controlasistencia;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -14,8 +16,14 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.example.controlasistencia.adapter.AsistenciasAdapter;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.text.SimpleDateFormat;
@@ -122,6 +130,7 @@ public class AsistenciaFormActivity extends AppCompatActivity {
     }
 
     private void cargarEmpleados() {
+        /*
         empleadoDAO.open();
         List<Empleado> empleados = empleadoDAO.getAllEmpleados();
         empleadoDAO.close();
@@ -130,6 +139,32 @@ public class AsistenciaFormActivity extends AppCompatActivity {
                 android.R.layout.simple_spinner_item, empleados);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spEmpleado.setAdapter(adapter);
+
+
+         */
+
+        empleadoDAO.cargarEmpleadoGoogle(new EmpleadoDAO.EmpleadoCallback() {
+            @Override
+            public void onEmpleadosCargados(List<Empleado> empleados) {
+                List<String> nombresEmpleados = new ArrayList<>();
+                for (Empleado empleado : empleados) {
+                    nombresEmpleados.add(empleado.getNombre());
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(AsistenciaFormActivity.this,
+                        android.R.layout.simple_spinner_item, nombresEmpleados);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spEmpleado.setAdapter(adapter);
+            }
+            @Override
+            public void onError(String mensajeError) {
+                Toast.makeText(AsistenciaFormActivity.this, mensajeError, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+
     }
 
     private void cargarTiposAsistencia() {
@@ -141,6 +176,7 @@ public class AsistenciaFormActivity extends AppCompatActivity {
     }
 
     private void cargarAsistencia() {
+        /*
         asistenciaDAO.open();
         Asistencia asistencia = asistenciaDAO.getAsistencia(asistenciaId);
         asistenciaDAO.close();
@@ -165,11 +201,49 @@ public class AsistenciaFormActivity extends AppCompatActivity {
                     break;
                 }
             }
-
+            Log.d("Asistencia", "Fecha: " + asistencia.getFecha());
+            Log.d("Asistencia", "Hora: " + asistencia.getHora());
+            Log.d("Asistencia", "Notas: " + asistencia.getNotas());
             etFecha.setText(asistencia.getFecha());
             etHora.setText(asistencia.getHora());
             etNotas.setText(asistencia.getNotas());
         }
+
+         */
+        asistenciaDAO.cargarAsistenciaGoogle(new AsistenciaDAO.AsistenciaCallback() {
+            @Override
+            public void onAsistenciasCargadas(List<Asistencia> asistencias) {
+                asistencias.forEach(asistencia -> {
+                    if (asistencia.getId() == asistenciaId) {
+                        String fechaFormato = asistencia.getFecha();
+                        String fechaFormateada = "";
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            ZonedDateTime fechaZonedDateTime = ZonedDateTime.parse(fechaFormato);
+                            fechaFormateada = fechaZonedDateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                        }
+
+
+                        etFecha.setText(fechaFormateada);
+
+                        fechaFormato = asistencia.getHora();
+                        fechaFormateada = "";
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            ZonedDateTime fechaZonedDateTime = ZonedDateTime.parse(fechaFormato);
+                            fechaFormateada = fechaZonedDateTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+                        }
+
+
+                        etHora.setText(fechaFormateada);
+                        etNotas.setText(asistencia.getNotas());
+                    }
+                    });
+
+            }
+            @Override
+            public void onError(String mensajeError) {
+                Toast.makeText(AsistenciaFormActivity.this, mensajeError, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void guardarAsistencia() {

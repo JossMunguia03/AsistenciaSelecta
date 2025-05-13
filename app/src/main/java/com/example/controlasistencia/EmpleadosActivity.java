@@ -2,6 +2,7 @@ package com.example.controlasistencia;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -53,8 +54,24 @@ public class EmpleadosActivity extends AppCompatActivity {
     }
 
     private void cargarEmpleados() {
-        List<Empleado> empleados = empleadoDAO.getAllEmpleados();
-        EmpleadosAdapter adapter = new EmpleadosAdapter(this, empleados);
-        listViewEmpleados.setAdapter(adapter);
+        //List<Empleado> empleados = empleadoDAO.getAllEmpleados();
+        //EmpleadosAdapter adapter = new EmpleadosAdapter(this, empleados);
+        //listViewEmpleados.setAdapter(adapter);
+
+        empleadoDAO.cargarEmpleadoGoogle(new EmpleadoDAO.EmpleadoCallback() {
+
+            @Override
+            public void onEmpleadosCargados(List<Empleado> empleados) {
+                Log.d("EmpleadosCargados", "Empleados cargados: " + empleados.size());
+                Log.d("EmpleadosCargados", "Empleados cargados: " + empleados);
+                EmpleadosAdapter adapter = new EmpleadosAdapter(EmpleadosActivity.this, empleados);
+                listViewEmpleados.setAdapter(adapter);
+            }
+
+            @Override
+            public void onError(String mensajeError) {
+                // Manejar el error si es necesario
+            }
+        });
     }
 } 

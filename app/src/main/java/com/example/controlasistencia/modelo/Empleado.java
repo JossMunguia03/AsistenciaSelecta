@@ -8,6 +8,7 @@ public class Empleado {
     private String puesto;
     private String email;
     private String telefono;
+    private String nombreDepartamento; // Nuevo atributo para el nombre del departamento
 
     public Empleado() {
     }
@@ -20,6 +21,13 @@ public class Empleado {
         this.puesto = puesto;
         this.email = email;
         this.telefono = telefono;
+        this.nombreDepartamento = "sin departamento"; // Inicializa el nombre del departamento
+    }
+    public Empleado(int id, String nombre, String apellidos) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellidos = apellidos;
+
     }
 
     // Getters
@@ -30,6 +38,7 @@ public class Empleado {
     public String getPuesto() { return puesto; }
     public String getEmail() { return email; }
     public String getTelefono() { return telefono; }
+    public String getNombreDepartamento() { return nombreDepartamento; }
 
     // Setters
     public void setId(int id) { this.id = id; }
@@ -39,4 +48,7 @@ public class Empleado {
     public void setPuesto(String puesto) { this.puesto = puesto; }
     public void setEmail(String email) { this.email = email; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
+    public void setNombreDepartamento(String nombreDepartamento) { this.nombreDepartamento = nombreDepartamento; }
+
+
 } 

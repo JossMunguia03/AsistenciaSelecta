@@ -44,7 +44,7 @@ public class AsistenciasAdapter extends ArrayAdapter<Asistencia> {
         ImageButton btnEliminar = rowView.findViewById(R.id.btnEliminar);
 
         final Asistencia asistencia = asistencias.get(position);
-        
+        /*
         empleadoDAO.open();
         Empleado empleado = empleadoDAO.getEmpleado(asistencia.getIdEmpleado());
         empleadoDAO.close();
@@ -52,7 +52,9 @@ public class AsistenciasAdapter extends ArrayAdapter<Asistencia> {
         if (empleado != null) {
             tvEmpleado.setText(empleado.getNombre() + " " + empleado.getApellidos());
         }
-        
+
+         */
+        tvEmpleado.setText(asistencia.getEmpleado() + " " + asistencia.getApellidoEmpleado());
         //tvFecha.setText(asistencia.getFechaEntrada());
         tvFecha.setText(asistencia.getFecha());
         tvTipo.setText(asistencia.getTipoAsistencia());

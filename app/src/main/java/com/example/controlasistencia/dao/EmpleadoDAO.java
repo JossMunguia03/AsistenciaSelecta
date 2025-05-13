@@ -4,20 +4,44 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import java.util.ArrayList;
-import java.util.List;
+import android.util.Log;
+import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.example.controlasistencia.DepartamentosActivity;
+import com.example.controlasistencia.adapter.DepartamentosAdapter;
 import com.example.controlasistencia.db.DatabaseHelper;
+import com.example.controlasistencia.modelo.Departamento;
 import com.example.controlasistencia.modelo.Empleado;
+import com.example.controlasistencia.modelo.IGoogleSheets;
+import com.example.controlasistencia.utils.Common;
+import com.example.controlasistencia.dao.DepartamentoDAO;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class EmpleadoDAO {
     private DatabaseHelper dbHelper;
     private SQLiteDatabase database;
-
+    private IGoogleSheets iGoogleSheets;
+    private DepartamentoDAO departamentoDAO;
     public EmpleadoDAO(Context context) {
         dbHelper = new DatabaseHelper(context);
     }
 
+    public interface EmpleadoCallback {
+        void onEmpleadosCargados(List<Empleado> empleados);
+        void onError(String mensajeError);
+    }
     public void open() {
         database = dbHelper.getWritableDatabase();
     }
@@ -58,6 +82,159 @@ public class EmpleadoDAO {
                 new String[]{String.valueOf(id)});
     }
 
+    public void cargarEmpleadoGoogle(EmpleadoCallback callback) {
+        List<Empleado> empleadoList;
+        empleadoList = new ArrayList<>();
+        departamentoDAO = new DepartamentoDAO(null);
+        departamentoDAO.cargarDepartamentoGoogle(new DepartamentoDAO.DepartamentoCallback() {
+
+            @Override
+            public void onDepartamentosCargados(List<Departamento> departamentos) {
+
+                Log.i("uwu","departamentos" + departamentos);
+                try {
+                    iGoogleSheets = Common.iGSGetMethodClient(Common.BASE_URL); // Usar la función de Common
+
+                    // Define los parámetros que necesitas enviar
+                    Map<String, String> queryParams = new HashMap<>();
+                    queryParams.put("spreadsheetId", Common.GOOGLE_SHEET_ID);
+                    queryParams.put("sheet", "empleado");
+
+                    Log.d("urlUsada", "Llamando a: " + Common.BASE_URL + "exec con parámetros: " + queryParams);
+
+
+
+                    iGoogleSheets.getData(queryParams).enqueue(new Callback<String>() { // Usamos el método con @QueryMap
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+
+                            try {
+                                String body = response.body();
+                                Log.d("RespuestaGoogle", "Respuesta: " + body);
+                                if (body == null) {
+                                    callback.onError("Respuesta vacía del servidor");
+                                    return;
+                                }
+                                assert response.body() != null;
+                                JSONObject responseObject = new JSONObject(response.body());
+                                JSONArray datosArray = responseObject.getJSONArray("datos");
+
+                                empleadoList.clear(); // Limpia la lista antes de agregar nuevos elementos
+                                for (int i = 0; i < datosArray.length(); i++) {
+                                    JSONObject object = datosArray.getJSONObject(i);
+                                    int id = object.getInt("id");
+                                    String nombre = object.getString("nombre");
+                                    String apellidos = object.getString("apellidos");
+                                    int idDepartamento = object.getInt("id departamento");
+                                    String puesto = object.getString("puesto");
+                                    String email = object.getString("email");
+                                    String telefono = object.getString("telefono");
+
+                                    Empleado empleado = new Empleado(id, nombre, apellidos, idDepartamento, puesto, email, telefono);
+                                    Log.i("departamentos","departamento: " + i + " " + empleado.getNombre());
+                                    empleadoList.add(empleado);
+                                }
+                                //recorremos la lista de departamentos para obtener el nombre del departamento
+                                for (int i = 0; i < empleadoList.size(); i++) {
+                                    Empleado empleado = empleadoList.get(i);
+                                    int idDepartamento = empleado.getIdDepartamento();
+                                    for (int j = 0; j < departamentos.size(); j++) {
+                                        Departamento departamento = departamentos.get(j);
+                                        if (departamento.getId() == idDepartamento) {
+                                            empleado.setNombreDepartamento(departamento.getNombre());
+                                            break;
+                                        }
+                                    }
+                                }
+
+
+
+
+                                callback.onEmpleadosCargados(empleadoList);
+
+
+                            } catch (JSONException e) {
+                                Log.e("JSONError", "Error al parsear JSON: " + e.getMessage(), e);
+                                callback.onError("Error al parsear JSON: " + e.getMessage());
+
+
+                            }
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+                            Log.e("Retrofit", "Fallo al conectar: " + t.getMessage());
+                            callback.onError("Fallo al conectar: " + t.getMessage());
+
+
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e("cargaDepartamento", "Error: " + e.getMessage(), e);
+
+                }
+
+            }
+            @Override
+            public void onError(String mensajeError) {
+
+            }
+        });
+
+    }
+
+    public void cargarEmpleadosIdNombre(EmpleadoCallback callback) {
+        List<Empleado> empleadoList;
+        empleadoList = new ArrayList<>();
+        try {
+            iGoogleSheets = Common.iGSGetMethodClient(Common.BASE_URL); // Usar la función de Common
+            // Define los parámetros que necesitas enviar
+            Map<String, String> queryParams = new HashMap<>();
+            queryParams.put("spreadsheetId", Common.GOOGLE_SHEET_ID);
+            queryParams.put("sheet", "empleado");
+            Log.d("urlUsada", "Llamando a: " + Common.BASE_URL + "exec con parámetros: " + queryParams);
+            iGoogleSheets.getData(queryParams).enqueue(new Callback<String>() { // Usamos el método con @QueryMap
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    try {
+                        String body = response.body();
+                        Log.d("RespuestaGoogle", "Respuesta: " + body);
+                        if (body == null) {
+                            callback.onError("Respuesta vacía del servidor");
+                            return;
+                        }
+                        assert response.body() != null;
+                        JSONObject responseObject = new JSONObject(response.body());
+                        JSONArray datosArray = responseObject.getJSONArray("datos");
+                        empleadoList.clear(); // Limpia la lista antes de agregar nuevos elementos
+                        for (int i = 0; i < datosArray.length(); i++) {
+                            JSONObject object = datosArray.getJSONObject(i);
+                            int id = object.getInt("id");
+                            String nombre = object.getString("nombre");
+                            String apellidos = object.getString("apellidos");
+                            empleadoList.add(new Empleado(id, nombre, apellidos));
+
+                        }
+
+                        callback.onEmpleadosCargados(empleadoList);
+
+                    } catch (JSONException e) {
+                        Log.e("JSONError", "Error al parsear JSON: " + e.getMessage(), e);
+                        callback.onError("Error al parsear JSON: " + e.getMessage());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                    Log.e("Retrofit", "Fallo al conectar: " + t.getMessage());
+                    callback.onError("Fallo al conectar: " + t.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            Log.e("cargaDepartamento", "Error: " + e.getMessage(), e);
+        }
+    }
     public Empleado getEmpleado(int id) {
         Cursor cursor = database.query(DatabaseHelper.TABLE_EMPLEADOS,
                 null,
