@@ -18,6 +18,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.controlasistencia.adapter.AsistenciasAdapter;
+import com.example.controlasistencia.dao.GoogleDAO;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -25,9 +26,12 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.Map;
+
 import android.content.Intent;
 
 import com.example.controlasistencia.dao.AsistenciaDAO;
@@ -47,6 +51,7 @@ public class AsistenciaFormActivity extends AppCompatActivity {
 
     private AsistenciaDAO asistenciaDAO;
     private EmpleadoDAO empleadoDAO;
+    private GoogleDAO googleDAO;
     private int asistenciaId = -1;
 
     private int empleado_id = -1;
@@ -61,6 +66,7 @@ public class AsistenciaFormActivity extends AppCompatActivity {
 
         asistenciaDAO = new AsistenciaDAO(this);
         empleadoDAO = new EmpleadoDAO(this);
+        googleDAO = new GoogleDAO();
 
         spEmpleado = findViewById(R.id.spEmpleado);
         spTipoAsistencia = findViewById(R.id.spTipoAsistencia);
@@ -268,26 +274,45 @@ public class AsistenciaFormActivity extends AppCompatActivity {
             public void onError(String mensajeError) {
                 Toast.makeText(AsistenciaFormActivity.this, mensajeError, Toast.LENGTH_SHORT).show();
             }
+
+            @Override
+            public void onAsistenciaCreada(String mensajeExito) {
+
+            }
+
+            @Override
+            public void onErrorAsistencia(String mensajeError) {
+
+            }
         });
     }
 
     private void guardarAsistencia() {
-        Empleado empleado = (Empleado) spEmpleado.getSelectedItem();
+        //Empleado empleado = (Empleado) spEmpleado.getSelectedItem();
         String tipoAsistencia = spTipoAsistencia.getSelectedItem().toString();
         String fecha = etFecha.getText().toString().trim();
         String hora = etHora.getText().toString().trim();
         String notas = etNotas.getText().toString().trim();
 
-        if (empleado == null || fecha.isEmpty() || hora.isEmpty()) {
-            Toast.makeText(this, "Por favor, complete los campos obligatorios", Toast.LENGTH_SHORT).show();
-            return;
-        }
+
 
         Asistencia asistencia = new Asistencia();
         if (asistenciaId != -1) {
             asistencia.setId(asistenciaId);
         }
-        asistencia.setIdEmpleado(empleado.getId());
+
+        String idEmpleado = spEmpleado.getSelectedItem().toString();
+
+        if (idEmpleado == null || fecha.isEmpty() || hora.isEmpty()) {
+            Toast.makeText(this, "Por favor, complete los campos obligatorios", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String[] partes = idEmpleado.split(" - ");
+        idEmpleado = partes[0];
+
+
+        asistencia.setIdEmpleado(Integer.parseInt(idEmpleado));
         asistencia.setTipoAsistencia(tipoAsistencia);
         asistencia.setFecha(fecha);
         asistencia.setHora(hora);
@@ -295,11 +320,49 @@ public class AsistenciaFormActivity extends AppCompatActivity {
 
         asistenciaDAO.open();
         if (asistenciaId != -1) {
-            asistenciaDAO.updateAsistencia(asistencia);
-            Toast.makeText(this, "Asistencia actualizada", Toast.LENGTH_SHORT).show();
+
+            Map<String, Object> camposAActializar = new HashMap<>();
+            camposAActializar.put("idEmpleado", idEmpleado);
+            camposAActializar.put("tipoAsistencia", tipoAsistencia);
+            camposAActializar.put("fecha", fecha);
+            camposAActializar.put("hora", hora);
+            camposAActializar.put("notas", notas);
+            googleDAO.actualizarDataGoogle(asistenciaId, "asistencias", camposAActializar, new GoogleDAO.GoogleCallback() {
+
+                @Override
+                public void onDataUpdated(String mensajeExito) {
+                    Toast.makeText(AsistenciaFormActivity.this, "Asistencia actualizada", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onUpdateFailed(String mensajeError) {
+                    Toast.makeText(AsistenciaFormActivity.this, "Error al actualizar la asistencia", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
         } else {
-            asistenciaDAO.insertAsistencia(asistencia);
-            Toast.makeText(this, "Asistencia creada", Toast.LENGTH_SHORT).show();
+            asistenciaDAO.nuevoAsistencia(asistencia, new AsistenciaDAO.AsistenciaCallback() {
+                @Override
+                public void onAsistenciasCargadas(List<Asistencia> asistencias) {
+
+                }
+
+                @Override
+                public void onError(String mensajeError) {
+
+                }
+
+                @Override
+                public void onAsistenciaCreada(String mensajeExito) {
+                    Toast.makeText(AsistenciaFormActivity.this, mensajeExito, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onErrorAsistencia(String mensajeError) {
+
+                }
+            });
         }
         asistenciaDAO.close();
 

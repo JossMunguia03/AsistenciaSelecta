@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 import com.example.controlasistencia.db.DatabaseHelper;
 import com.example.controlasistencia.modelo.Asistencia;
+import com.example.controlasistencia.modelo.DataPost;
 import com.example.controlasistencia.modelo.Departamento;
 import com.example.controlasistencia.modelo.Empleado;
 import com.example.controlasistencia.modelo.IGoogleSheets;
@@ -38,6 +40,8 @@ public class AsistenciaDAO {
     public interface AsistenciaCallback {
         void onAsistenciasCargadas(List<Asistencia> asistencias);
         void onError(String mensajeError);
+        void onAsistenciaCreada(String mensajeExito);
+        void onErrorAsistencia(String mensajeError);
     }
 
     public void open() {
@@ -229,6 +233,48 @@ public class AsistenciaDAO {
 
     }
 
+    public void nuevoAsistencia(Asistencia asistencia, AsistenciaCallback callback) {
+        List<List<String>> rows = new ArrayList<>();
+        List<String> rowData = new ArrayList<>();
+
+        rowData.add(String.valueOf(asistencia.getIdEmpleado()));
+        rowData.add(asistencia.getTipoAsistencia());
+        rowData.add(asistencia.getFecha());
+        rowData.add(asistencia.getHora());
+        rowData.add(asistencia.getNotas());
+        rows.add(rowData);
+        DataPost dataPost = new DataPost(
+                Common.GOOGLE_SHEET_ID,
+                "asistencias",
+                rows
+        );
+
+        iGoogleSheets.sendData(dataPost).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d("CrearAsistencia", "Respuesta POST: " + response.body());
+                    callback.onAsistenciaCreada(response.body()); // Llama al callback con la respuesta
+                } else {
+                    String errorMessage = "Error al enviar datos. Código: " + response.code();
+                    if (response.errorBody() != null) {
+                        try {
+                            errorMessage += ", Mensaje: " + response.errorBody().string();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    callback.onErrorAsistencia(errorMessage);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("CrearAsistencia", "Fallo al conectar (POST): " + t.getMessage());
+                callback.onErrorAsistencia("Error de conexión al enviar datos.");
+            }
+        });
+    }
     private Asistencia cursorToAsistencia(Cursor cursor) {
         Asistencia asistencia = new Asistencia();
         asistencia.setId(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID)));

@@ -11,11 +11,14 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.example.controlasistencia.adapter.EmpleadosAdapter;
 import com.example.controlasistencia.dao.DepartamentoDAO;
 import com.example.controlasistencia.dao.EmpleadoDAO;
+import com.example.controlasistencia.dao.GoogleDAO;
 import com.example.controlasistencia.modelo.Departamento;
 import com.example.controlasistencia.modelo.Empleado;
 
@@ -30,6 +33,7 @@ public class EmpleadoFormActivity extends AppCompatActivity {
 
     private EmpleadoDAO empleadoDAO;
     private DepartamentoDAO departamentoDAO;
+    private GoogleDAO googleDAO;
     private int empleadoId = -1;
 
     @Override
@@ -39,6 +43,7 @@ public class EmpleadoFormActivity extends AppCompatActivity {
 
         empleadoDAO = new EmpleadoDAO(this);
         departamentoDAO = new DepartamentoDAO(this);
+        googleDAO = new GoogleDAO();
 
         etNombre = findViewById(R.id.etNombre);
         etApellidos = findViewById(R.id.etApellidos);
@@ -214,7 +219,30 @@ public class EmpleadoFormActivity extends AppCompatActivity {
         //empleadoDAO.open();
         if (empleadoId != -1) {
             //empleadoDAO.updateEmpleado(empleado);
-            Toast.makeText(this, "Empleado actualizado", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Empleado actualizado", Toast.LENGTH_SHORT).show();
+
+            Map<String, Object> camposAActializar = new HashMap<>();
+            camposAActializar.put("nombre", nombre);
+            camposAActializar.put("apellidos", apellidos);
+            camposAActializar.put("idDepartamento", idDepartamento);
+            camposAActializar.put("puesto", puesto);
+            camposAActializar.put("email", email);
+            camposAActializar.put("telefono", telefono);
+
+            googleDAO.actualizarDataGoogle(empleadoId, "empleado", camposAActializar, new GoogleDAO.GoogleCallback() {
+
+                @Override
+                public void onDataUpdated(String mensajeExito) {
+                    Toast.makeText(EmpleadoFormActivity.this, "Empleado actualizado", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onUpdateFailed(String mensajeError) {
+
+                }
+            });
+
+
         } else {
             /*
             empleadoDAO.insertEmpleado(empleado);

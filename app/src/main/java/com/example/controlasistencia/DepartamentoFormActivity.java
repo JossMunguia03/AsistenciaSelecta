@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.controlasistencia.adapter.DepartamentosAdapter;
 import com.example.controlasistencia.dao.DepartamentoDAO;
+import com.example.controlasistencia.dao.GoogleDAO;
 import com.example.controlasistencia.modelo.Departamento;
 import com.example.controlasistencia.modelo.IGoogleSheets;
 import com.example.controlasistencia.utils.Common;
@@ -17,7 +18,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,6 +33,8 @@ public class DepartamentoFormActivity extends AppCompatActivity {
 
     private List<Departamento> departamentoList;
     private DepartamentoDAO departamentoDAO;
+
+    private GoogleDAO googleDAO;
     private int departamentoId = -1;
     IGoogleSheets iGoogleSheets;
     @Override
@@ -38,6 +43,8 @@ public class DepartamentoFormActivity extends AppCompatActivity {
         setContentView(R.layout.activity_departamento_form);
 
         departamentoDAO = new DepartamentoDAO(this);
+        googleDAO = new GoogleDAO();
+
         departamentoDAO.open();
 
         etNombre = findViewById(R.id.etNombre);
@@ -163,8 +170,24 @@ public class DepartamentoFormActivity extends AppCompatActivity {
         departamento.setDescripcion(descripcion);
 
         if (departamentoId != -1) {
-            departamentoDAO.updateDepartamento(departamento);
-            Toast.makeText(this, "Departamento actualizado", Toast.LENGTH_SHORT).show();
+            //departamentoDAO.updateDepartamento(departamento);
+            //Toast.makeText(this, "Departamento actualizado", Toast.LENGTH_SHORT).show();
+
+            Map<String, Object> camposAActializar = new HashMap<>();
+            camposAActializar.put("nombre", nombre);
+            camposAActializar.put("descripcion", descripcion);
+            googleDAO.actualizarDataGoogle(departamentoId,"departamento", camposAActializar, new GoogleDAO.GoogleCallback() {
+                @Override
+                public void onDataUpdated(String mensajeExito) {
+                    Toast.makeText(DepartamentoFormActivity.this, mensajeExito, Toast.LENGTH_SHORT).show();
+
+                }
+
+                @Override
+                public void onUpdateFailed(String mensajeError) {
+                    Toast.makeText(DepartamentoFormActivity.this, mensajeError, Toast.LENGTH_SHORT).show();
+                }
+            });
         } else {
             /*
             departamentoDAO.insertDepartamento(departamento);

@@ -68,6 +68,16 @@ public class AsistenciasActivity extends AppCompatActivity {
             public void onError(String mensajeError) {
                 Toast.makeText(AsistenciasActivity.this, mensajeError, Toast.LENGTH_SHORT).show();
             }
+
+            @Override
+            public void onAsistenciaCreada(String mensajeExito) {
+
+            }
+
+            @Override
+            public void onErrorAsistencia(String mensajeError) {
+
+            }
         });
 
         //AsistenciasAdapter adapter = new AsistenciasAdapter(this, asistencias);
