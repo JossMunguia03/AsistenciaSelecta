@@ -2,6 +2,8 @@ package com.example.controlasistencia.dao;
 
 import android.util.Log;
 
+
+import com.example.controlasistencia.modelo.DeleteRequest;
 import com.example.controlasistencia.modelo.IGoogleSheets;
 import com.example.controlasistencia.modelo.UpdateData;
 import com.example.controlasistencia.utils.Common;
@@ -20,6 +22,10 @@ public class GoogleDAO {
         void onDataUpdated(String mensajeExito);
         void onUpdateFailed(String mensajeError);
     }
+    public interface GoogleDelateCallback{
+        void onDataDeleted(String mensajeExito);
+        void onDeleteFailed(String mensajeError);
+    }
     public GoogleDAO() {
         iGoogleSheets = Common.iGSGetMethodClient(Common.BASE_URL);
     }
@@ -31,7 +37,7 @@ public class GoogleDAO {
                 sheetName,
                 fieldsToUpdate
         );
-
+        //the cake is a lie
         iGoogleSheets.updateData(updateData).enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -58,4 +64,39 @@ public class GoogleDAO {
             }
         });
     }
-}
+
+    public void eliminarDataGoogle(int id, String sheetName, final GoogleDelateCallback callback) {
+        DeleteRequest deleteRequest = new DeleteRequest(
+                "eliminar",
+                id,
+                Common.GOOGLE_SHEET_ID,
+                sheetName
+        );
+
+        iGoogleSheets.deleteData(deleteRequest).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d("Eliminar" + sheetName, "Respuesta: " + response.body());
+                    callback.onDataDeleted(response.body());
+                } else {
+                    String errorMessage = "Error al eliminar " + sheetName + ". Código: " + response.code();
+                    if (response.errorBody() != null) {
+                        try {
+                            errorMessage += ", Mensaje: " + response.errorBody().string();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    callback.onDeleteFailed(errorMessage);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("Eliminar" + sheetName, "Fallo al conectar: " + t.getMessage());
+                callback.onDeleteFailed("Error de conexión al eliminar " + sheetName + ".");
+            }
+        });
+    }
+    }

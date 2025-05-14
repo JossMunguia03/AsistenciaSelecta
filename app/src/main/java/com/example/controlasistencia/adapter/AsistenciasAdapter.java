@@ -1,5 +1,6 @@
 package com.example.controlasistencia.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -12,9 +13,12 @@ import android.widget.Toast;
 import java.util.List;
 
 import com.example.controlasistencia.AsistenciaFormActivity;
+import com.example.controlasistencia.AsistenciasActivity;
+import com.example.controlasistencia.EmpleadosActivity;
 import com.example.controlasistencia.R;
 import com.example.controlasistencia.dao.AsistenciaDAO;
 import com.example.controlasistencia.dao.EmpleadoDAO;
+import com.example.controlasistencia.dao.GoogleDAO;
 import com.example.controlasistencia.modelo.Asistencia;
 import com.example.controlasistencia.modelo.Empleado;
 
@@ -23,6 +27,7 @@ public class AsistenciasAdapter extends ArrayAdapter<Asistencia> {
     private List<Asistencia> asistencias;
     private AsistenciaDAO asistenciaDAO;
     private EmpleadoDAO empleadoDAO;
+    private GoogleDAO googleDAO;
 
     public AsistenciasAdapter(Context context, List<Asistencia> asistencias) {
         super(context, R.layout.item_asistencia, asistencias);
@@ -72,12 +77,34 @@ public class AsistenciasAdapter extends ArrayAdapter<Asistencia> {
         btnEliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                asistenciaDAO.open();
-                asistenciaDAO.deleteAsistencia(asistencia.getId());
-                asistenciaDAO.close();
-                asistencias.remove(position);
-                notifyDataSetChanged();
-                Toast.makeText(context, "Asistencia eliminada", Toast.LENGTH_SHORT).show();
+                //inicio de la alerta
+                googleDAO = new GoogleDAO();
+                AlertDialog.Builder builder;
+                builder = new AlertDialog.Builder(v.getContext());
+                builder.setTitle("Eliminar Asistencia");
+                builder.setMessage("¿Estás seguro de que deseas eliminar esta asistencia?");
+                builder.setPositiveButton("Sí", (dialog, which) -> {
+                    googleDAO.eliminarDataGoogle(asistencia.getId(), "asistencias", new GoogleDAO.GoogleDelateCallback() {
+
+
+                        @Override
+                        public void onDataDeleted(String mensajeExito) {
+                            v.getContext().startActivity(new Intent(v.getContext(), AsistenciasActivity.class));
+                        }
+
+                        @Override
+                        public void onDeleteFailed(String mensajeError) {
+
+                        }
+                    });
+                });
+                builder.setNegativeButton("No", null);
+                builder.setIcon(android.R.drawable.ic_dialog_alert);
+                AlertDialog show = builder
+                        .show();
+
+
+                //fin de la alerta
             }
         });
 

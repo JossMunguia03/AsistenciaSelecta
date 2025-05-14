@@ -21,4 +21,7 @@ public interface IGoogleSheets {
 
     @POST("exec")
     Call<String> updateData(@Body UpdateData updateData);
+
+    @POST("exec")
+    Call<String> deleteData(@Body DeleteRequest deleteRequest);
 }
